@@ -5,7 +5,7 @@
 Based on the official Skills Framework API documentation at:
 https://developer.ssg-wsg.gov.sg/webapp/docs/product/6Gl44K5M46EuDgn7LCsAs2/group/5uyNzClV5UJk6Uo0wDg7Mt
 
-The following corrections have been made to `src/api_examples.py`:
+The following corrections have been made to `src/skills_framework_api_examples.py`:
 
 ## 1. Corrected API Endpoints
 

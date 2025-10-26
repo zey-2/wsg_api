@@ -14,7 +14,7 @@
 ## Python API Methods
 
 ```python
-from api_examples import SkillsFrameworkAPI
+from skills_framework_api_examples import SkillsFrameworkAPI
 
 api = SkillsFrameworkAPI()
 
@@ -74,10 +74,10 @@ These require OAuth2 or additional permissions:
 
 ```bash
 # Run all 7 examples
-python src/api_examples.py
+python src/skills_framework_api_examples.py
 
 # Test individual endpoints
-python -c "import sys; sys.path.insert(0, 'src'); from api_examples import example_1_search_job_roles; example_1_search_job_roles()"
+python -c "import sys; sys.path.insert(0, 'src'); from skills_framework_api_examples import example_1_search_job_roles; example_1_search_job_roles()"
 ```
 
 All endpoints tested and verified: **2025-10-26**

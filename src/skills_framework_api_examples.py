@@ -363,7 +363,7 @@ def example_7_ccs_autocomplete_details():
 
 def save_example_output(filename: str, data: Dict[str, Any]) -> None:
     """Save example output to a JSON file."""
-    output_dir = "data/examples"
+    output_dir = "data/skills_framework_examples"
     os.makedirs(output_dir, exist_ok=True)
     
     file_path = os.path.join(output_dir, filename)

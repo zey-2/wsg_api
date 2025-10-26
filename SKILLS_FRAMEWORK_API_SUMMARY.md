@@ -190,7 +190,7 @@ All working endpoints return JSON responses with the following general structure
 
 ## Usage Examples
 
-See `src/api_examples.py` for complete working examples:
+See `src/skills_framework_api_examples.py` for complete working examples:
 
 1. **Search Job Roles by Keyword** - Basic search functionality
 2. **Job Role Title Autocomplete** - Interactive search suggestions
@@ -202,18 +202,18 @@ See `src/api_examples.py` for complete working examples:
 
 ## Files Updated
 
-- ✅ `src/api_examples.py` - Now includes 7 working certificate-auth examples
+- ✅ `src/skills_framework_api_examples.py` - Now includes 7 working certificate-auth examples
 - ✅ `src/test_api_fixes.py` - Test script for endpoint verification
 - ✅ `FIXES_APPLIED.md` - Documentation of changes made
 - ✅ `README.md` - Updated with reference source
-- ✅ `CERTIFICATE_AUTH_SUMMARY.md` - Comprehensive endpoint documentation
+- ✅ `SKILLS_FRAMEWORK_API_SUMMARY.md` - Comprehensive endpoint documentation
 
 ## Testing
 
 Run all examples:
 
 ```bash
-python src/api_examples.py
+python src/skills_framework_api_examples.py
 ```
 
 Then select option `0` to run all examples, or choose individual examples 1-7.

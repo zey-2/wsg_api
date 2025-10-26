@@ -9,7 +9,7 @@ https://github.com/ssg-wsg/Sample-Codes/tree/master/API%20Basic%20Access/Certifi
 
 ## Overview
 
-The `api_examples.py` file provides a complete implementation of all available Skills Framework API endpoints with working examples.
+The `skills_framework_api_examples.py` file provides a complete implementation of all available Skills Framework API endpoints with working examples.
 
 ## Prerequisites
 
@@ -63,7 +63,7 @@ pip install requests
 Run the script to access an interactive menu:
 
 ```bash
-python src/api_examples.py
+python src/skills_framework_api_examples.py
 ```
 
 This will display:
@@ -87,7 +87,7 @@ Select an example (0-15, or 'q' to quit):
 ### Using the SkillsFrameworkAPI Class
 
 ```python
-from api_examples import SkillsFrameworkAPI
+from skills_framework_api_examples import SkillsFrameworkAPI
 
 # Initialize the API client
 api = SkillsFrameworkAPI(
@@ -205,7 +205,7 @@ engineering_jobs = api.get_job_roles(
 
 ## Output
 
-All examples save their results to `data/examples/` directory as JSON files:
+All examples save their results to `data/skills_framework_examples/` directory as JSON files:
 
 - `example_1_job_roles_search.json`
 - `example_2_job_title_autocomplete.json`
@@ -350,11 +350,11 @@ To verify your setup:
 
 ```bash
 # Run a single example
-python src/api_examples.py
+python src/skills_framework_api_examples.py
 # Select option 1
 
 # Run all examples
-python src/api_examples.py
+python src/skills_framework_api_examples.py
 # Select option 0
 ```
 

@@ -7,7 +7,7 @@ Runs quick tests on all 6 working endpoints to ensure connectivity and proper re
 Usage: python src/test_api_fixes.py
 """
 
-from api_examples import SkillsFrameworkAPI
+from skills_framework_api_examples import SkillsFrameworkAPI
 import json
 
 
@@ -134,7 +134,7 @@ def main():
         print(f"\n⚠ Warning: {total - passed} endpoint(s) failed. Check error messages above.")
     
     print("\nNote: All tested endpoints use certificate authentication.")
-    print("For full examples with output saving, run: python src/api_examples.py")
+    print("For full examples with output saving, run: python src/skills_framework_api_examples.py")
 
 
 if __name__ == "__main__":
