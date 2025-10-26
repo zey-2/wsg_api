@@ -1,0 +1,5 @@
+# Requirements for Skills Framework Data Fetcher
+# Install with: pip install -r requirements.txt
+
+requests>=2.31.0
+pandas>=2.0.0
