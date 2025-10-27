@@ -73,8 +73,19 @@ class CoursesAPI:
             
         except requests.exceptions.RequestException as e:
             print(f"Error making request to {endpoint}: {str(e)}")
-            if hasattr(e.response, 'text'):
-                print(f"Response: {e.response.text}")
+            # Safely log server response if available
+            resp = getattr(e, 'response', None)
+            if resp is not None:
+                try:
+                    # Prefer JSON error bodies if provided
+                    err_json = resp.json()
+                    print(f"Response JSON: {json.dumps(err_json, indent=2, ensure_ascii=False)}")
+                except Exception:
+                    # Fallback to raw text
+                    try:
+                        print(f"Response: {resp.text}")
+                    except Exception:
+                        pass
             raise
     
     def get_course_categories(self, keyword: str) -> Dict[str, Any]:
@@ -224,6 +235,139 @@ class CoursesAPI:
         return self._make_request(
             endpoint="/courses/directory/autocomplete",
             params={'keyword': keyword},
+            headers={'x-api-version': 'v1.2'}
+        )
+    
+    def get_course_subcategories(self, browse_category_id: int) -> Dict[str, Any]:
+        """
+        Example 6: Get Course SubCategories
+        
+        Retrieve a list of course sub-categories within a main category by its ID.
+        The keyword search functionality is not available in this API.
+        
+        Args:
+            browse_category_id: The category ID to retrieve sub-categories for
+            
+        Returns:
+            Dictionary containing sub-categories
+            
+        API Endpoint: GET /courses/categories/{browseCategoryID}/subCategories
+        API Version: v1 (default)
+        """
+        return self._make_request(
+            endpoint=f"/courses/categories/{browse_category_id}/subCategories"
+        )
+    
+    def get_course_details(self, course_reference_number: str, 
+                          include_expired: bool = True) -> Dict[str, Any]:
+        """
+        Example 7: Get Course Details
+        
+        Retrieve comprehensive details of a course based on the course reference number.
+        These details include course information such as course runs, fees, objectives,
+        contents, course contact person, community feedback, and training provider information.
+        
+        Args:
+            course_reference_number: Course reference number (e.g., 'SCN-198202248E-01-CRS-N-0027685')
+            include_expired: Whether to retrieve expired courses (default: True)
+            
+        Returns:
+            Dictionary containing comprehensive course details
+            
+        API Endpoint: GET /courses/directory/{course reference number}
+        API Version: v1.2 (default)
+        """
+        return self._make_request(
+            endpoint=f"/courses/directory/{course_reference_number}",
+            params={'includeExpiredCourses': str(include_expired).lower()},
+            headers={'x-api-version': 'v1.2'}
+        )
+    
+    def get_related_courses(self, course_reference_number: str) -> Dict[str, Any]:
+        """
+        Example 8: Get Related Courses
+        
+        Retrieve up to 10 courses related to a specified course based on its 
+        course reference number. This helps users discover similar courses.
+        
+        Args:
+            course_reference_number: Course reference number
+            
+        Returns:
+            Dictionary containing related courses
+            
+        API Endpoint: GET /courses/directory/{course reference number}/related
+        API Version: v1 (default)
+        """
+        return self._make_request(
+            endpoint=f"/courses/directory/{course_reference_number}/related"
+        )
+    
+    def get_popular_courses(self, tagging_code: Optional[str] = None,
+                           page_size: int = 10, page: int = 0) -> Dict[str, Any]:
+        """
+        Example 9: Get Popular Courses
+        
+        Retrieve a list of popular courses along with course provider information.
+        Courses can be filtered based on course tagging code (WSQ, CET, PET, SFC, and PA).
+        Use this API to find out what the trending courses are.
+        
+        Args:
+            tagging_code: Course tagging code (optional). Examples: 'WSQ', 'CET', 'PET', 'SFC', 'PA'
+            page_size: Number of items per page (default: 10)
+            page: Page number, starting from 0 (default: 0)
+            
+        Returns:
+            Dictionary containing popular courses
+            
+        API Endpoint: GET /courses/directory/popular
+        API Version: v1.2 (Certificate)
+        """
+        params = {
+            'pageSize': str(page_size),
+            'page': str(page)
+        }
+        
+        if tagging_code:
+            params['taggingCode'] = tagging_code
+        
+        return self._make_request(
+            endpoint="/courses/directory/popular",
+            params=params,
+            headers={'x-api-version': 'v1.2'}
+        )
+    
+    def get_featured_courses(self, tagging_code: Optional[str] = None,
+                            page_size: int = 10, page: int = 0) -> Dict[str, Any]:
+        """
+        Example 10: Get Featured Courses
+        
+        Retrieve a list of featured courses along with course provider information
+        from the MySkillsFuture course directory. Courses can be filtered based on
+        course tagging code (WSQ, CET, PET, SFC, and PA).
+        
+        Args:
+            tagging_code: Course tagging code (optional). Examples: 'WSQ', 'CET', 'PET', 'SFC', 'PA'
+            page_size: Number of items per page (default: 10)
+            page: Page number, starting from 0 (default: 0)
+            
+        Returns:
+            Dictionary containing featured courses
+            
+        API Endpoint: GET /courses/directory/featured
+        API Version: v1.2 (Certificate)
+        """
+        params = {
+            'pageSize': str(page_size),
+            'page': str(page)
+        }
+        
+        if tagging_code:
+            params['taggingCode'] = tagging_code
+        
+        return self._make_request(
+            endpoint="/courses/directory/featured",
+            params=params,
             headers={'x-api-version': 'v1.2'}
         )
 
@@ -380,6 +524,161 @@ def example_5_autocomplete():
     save_response(result, "example_5_autocomplete.json")
     return result
 
+def example_6_subcategories():
+    """Example 6: Retrieve course sub-categories."""
+    print("\n" + "="*80)
+    print("Example 6: Get Course SubCategories")
+    print("="*80)
+    print("\nRetrieving sub-categories for category ID 34 (Area of Training)...")
+    
+    cert_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "cert.pem")
+    key_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "key.pem")
+    
+    api = CoursesAPI(cert_path, key_path)
+    result = api.get_course_subcategories(browse_category_id=34)
+    
+    subcategories = result.get('data', {}).get('subCategories', [])
+    total = result.get('meta', {}).get('total', 0)
+    
+    print(f"\nFound {total} sub-categories:")
+    for i, subcat in enumerate(subcategories[:15], 1):  # Show first 15
+        print(f"  {i}. {subcat.get('description')} (ID: {subcat.get('id')})")
+    if len(subcategories) > 15:
+        print(f"  ... and {len(subcategories) - 15} more sub-categories")
+    
+    save_response(result, "example_6_subcategories.json")
+    return result
+
+def example_7_course_details():
+    """Example 7: Retrieve detailed course information."""
+    print("\n" + "="*80)
+    print("Example 7: Get Course Details")
+    print("="*80)
+    
+    # Using an example course reference number
+    course_ref = "SCN-198202248E-01-CRS-N-0027685"
+    print(f"\nRetrieving details for course: {course_ref}...")
+    
+    cert_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "cert.pem")
+    key_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "key.pem")
+    
+    api = CoursesAPI(cert_path, key_path)
+    result = api.get_course_details(course_reference_number=course_ref)
+    
+    courses = result.get('data', {}).get('courses', [])
+    if courses:
+        course = courses[0]
+        print(f"\n  Title: {course.get('title')}")
+        print(f"  Reference: {course.get('referenceNumber')}")
+        
+        provider = course.get('trainingProvider', {})
+        if provider:
+            print(f"  Provider: {provider.get('name')}")
+        
+        print(f"  Duration: {course.get('totalTrainingDurationHour', 0)} hours")
+        print(f"  Cost: ${course.get('totalCostOfTrainingPerTrainee', 0):.2f}")
+        
+        areas = course.get('areaOfTrainings', [])
+        if areas:
+            print(f"  Area: {areas[0].get('description')}")
+        
+        runs = course.get('runs', [])
+        print(f"  Available runs: {len(runs)}")
+    else:
+        print("\n  No course details found")
+    
+    save_response(result, "example_7_course_details.json")
+    return result
+
+def example_8_related_courses():
+    """Example 8: Retrieve courses related to a specific course."""
+    print("\n" + "="*80)
+    print("Example 8: Get Related Courses")
+    print("="*80)
+    
+    # Using an example course reference number
+    course_ref = "SCN-198202248E-01-CRS-N-0027685"
+    print(f"\nRetrieving courses related to: {course_ref}...")
+    
+    cert_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "cert.pem")
+    key_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "key.pem")
+    
+    api = CoursesAPI(cert_path, key_path)
+    result = api.get_related_courses(course_reference_number=course_ref)
+    
+    courses = result.get('data', {}).get('courses', [])
+    
+    print(f"\nFound {len(courses)} related courses:")
+    for i, course in enumerate(courses, 1):
+        print(f"\n  {i}. {course.get('title')}")
+        print(f"     Reference: {course.get('referenceNumber')}")
+        provider = course.get('trainingProvider', {})
+        if provider:
+            print(f"     Provider: {provider.get('name')}")
+    
+    save_response(result, "example_8_related_courses.json")
+    return result
+
+def example_9_popular_courses():
+    """Example 9: Retrieve popular/trending courses."""
+    print("\n" + "="*80)
+    print("Example 9: Get Popular Courses")
+    print("="*80)
+    print("\nRetrieving popular courses...")
+    
+    cert_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "cert.pem")
+    key_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "key.pem")
+    
+    api = CoursesAPI(cert_path, key_path)
+    result = api.get_popular_courses(page_size=5)
+    
+    courses = result.get('data', {}).get('courses', [])
+    total = result.get('data', {}).get('meta', {}).get('total', 0)
+    
+    print(f"\nFound {total} popular courses (showing first {len(courses)}):")
+    for i, course in enumerate(courses, 1):
+        print(f"\n  {i}. {course.get('title')}")
+        print(f"     Reference: {course.get('referenceNumber')}")
+        provider = course.get('trainingProvider', {})
+        if provider:
+            print(f"     Provider: {provider.get('name')}")
+        areas = course.get('areaOfTrainings', [])
+        if areas:
+            print(f"     Area: {areas[0].get('description')}")
+    
+    save_response(result, "example_9_popular_courses.json")
+    return result
+
+def example_10_featured_courses():
+    """Example 10: Retrieve featured courses from MySkillsFuture."""
+    print("\n" + "="*80)
+    print("Example 10: Get Featured Courses")
+    print("="*80)
+    print("\nRetrieving featured courses from MySkillsFuture...")
+    
+    cert_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "cert.pem")
+    key_path = os.path.join(os.path.dirname(__file__), "..", "certificates", "key.pem")
+    
+    api = CoursesAPI(cert_path, key_path)
+    result = api.get_featured_courses(page_size=5)
+    
+    courses = result.get('data', {}).get('courses', [])
+    total = result.get('data', {}).get('meta', {}).get('total', 0)
+    
+    print(f"\nFound {total} featured courses (showing first {len(courses)}):")
+    for i, course in enumerate(courses, 1):
+        print(f"\n  {i}. {course.get('title')}")
+        print(f"     Reference: {course.get('referenceNumber')}")
+        provider = course.get('trainingProvider', {})
+        if provider:
+            print(f"     Provider: {provider.get('name')}")
+        areas = course.get('areaOfTrainings', [])
+        if areas:
+            print(f"     Area: {areas[0].get('description')}")
+    
+    save_response(result, "example_10_featured_courses.json")
+    return result
+
 def run_all_examples():
     """Run all Courses API examples."""
     print("\n" + "="*80)
@@ -395,6 +694,11 @@ def run_all_examples():
         ("3", "Search by Keyword", example_3_search_by_keyword),
         ("4", "Search by Tagging", example_4_search_by_tagging),
         ("5", "Autocomplete", example_5_autocomplete),
+        ("6", "Course SubCategories", example_6_subcategories),
+        ("7", "Course Details", example_7_course_details),
+        ("8", "Related Courses", example_8_related_courses),
+        ("9", "Popular Courses", example_9_popular_courses),
+        ("10", "Featured Courses", example_10_featured_courses),
     ]
     
     while True:
@@ -406,7 +710,7 @@ def run_all_examples():
         print("  0. Run all examples")
         print("  q. Quit")
         
-        choice = input("\nSelect an example (0-5, or q to quit): ").strip().lower()
+        choice = input("\nSelect an example (0-10, or q to quit): ").strip().lower()
         
         if choice == 'q':
             print("\nExiting...")

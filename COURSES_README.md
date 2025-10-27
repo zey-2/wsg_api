@@ -48,6 +48,11 @@ python src/courses_api_examples.py
 # 3. Search by Keyword
 # 4. Search by Tagging
 # 5. Autocomplete
+# 6. Course SubCategories
+# 7. Course Details
+# 8. Related Courses
+# 9. Popular Courses
+# 10. Featured Courses
 # 0. Run all examples
 # q. Quit
 ```
@@ -64,15 +69,20 @@ python src/test_api_fixes.py
 
 ## 📚 Available APIs
 
-### Courses API (5 Working Endpoints)
+### Courses API (10 Working Endpoints)
 
-| Endpoint                          | Description           | Example                                              |
-| --------------------------------- | --------------------- | ---------------------------------------------------- |
-| `/courses/categories`             | Get course categories | `api.get_course_categories(keyword='Training')`      |
-| `/courses/tags`                   | Get course tags       | `api.get_course_tags(sort_by='0')`                   |
-| `/courses/directory`              | Search by keyword     | `api.search_courses_by_keyword(keyword='python')`    |
-| `/courses/directory`              | Search by tagging     | `api.search_courses_by_tagging(tagging_codes=['1'])` |
-| `/courses/directory/autocomplete` | Get autocomplete      | `api.get_course_autocomplete(keyword='data')`        |
+| Endpoint                                               | Description              | Example                                                  |
+| ------------------------------------------------------ | ------------------------ | -------------------------------------------------------- |
+| `/courses/categories`                                  | Get course categories    | `api.get_course_categories(keyword='Training')`          |
+| `/courses/tags`                                        | Get course tags          | `api.get_course_tags(sort_by='0')`                       |
+| `/courses/directory`                                   | Search by keyword        | `api.search_courses_by_keyword(keyword='python')`        |
+| `/courses/directory`                                   | Search by tagging        | `api.search_courses_by_tagging(tagging_codes=['1'])`     |
+| `/courses/directory/autocomplete`                      | Get autocomplete         | `api.get_course_autocomplete(keyword='data')`            |
+| `/courses/categories/{browseCategoryID}/subCategories` | Get course subcategories | `api.get_course_subcategories(browse_category_id=34)`    |
+| `/courses/directory/{course reference number}`         | Get course details       | `api.get_course_details(course_reference_number='...')`  |
+| `/courses/directory/{course reference number}/related` | Get related courses      | `api.get_related_courses(course_reference_number='...')` |
+| `/courses/directory/popular`                           | Get popular courses      | `api.get_popular_courses(page_size=10)`                  |
+| `/courses/directory/featured`                          | Get featured courses     | `api.get_featured_courses(page_size=10)`                 |
 
 ### Skills Framework API (6 Working Endpoints)
 
@@ -85,7 +95,7 @@ python src/test_api_fixes.py
 | `/skills-framework/tsc/details`                           | TSC details      | `api.get_tsc_autocomplete_details(keyword='data')` |
 | `/skills-framework/ccs/details`                           | CCS details      | `api.get_ccs_autocomplete_details(keyword='comm')` |
 
-**Total Working Endpoints: 11** (5 Courses + 6 Skills Framework)
+**Total Working Endpoints: 16** (10 Courses + 6 Skills Framework)
 
 ## 💡 Usage Examples
 
@@ -126,6 +136,35 @@ suggestions = api.get_course_autocomplete(keyword='data')
 for course in suggestions['data']['courses']:
     title = course['title'].replace('<b>', '').replace('</b>', '')
     print(f"- {title}")
+
+# Example 5: Get course subcategories
+subcategories = api.get_course_subcategories(browse_category_id=34)
+for subcat in subcategories['data']['subCategories']:
+    print(f"- {subcat['description']}")
+
+# Example 6: Get detailed course information
+course_details = api.get_course_details(
+    course_reference_number='SCN-198202248E-01-CRS-N-0027685'
+)
+course = course_details['data']['courses'][0]
+print(f"Title: {course['title']}")
+print(f"Duration: {course['totalTrainingDurationHour']} hours")
+
+# Example 7: Get related courses
+related = api.get_related_courses(
+    course_reference_number='SCN-198202248E-01-CRS-N-0027685'
+)
+print(f"Found {len(related['data']['courses'])} related courses")
+
+# Example 8: Get popular courses
+popular = api.get_popular_courses(page_size=10)
+for course in popular['data']['courses']:
+    print(f"- {course['title']}")
+
+# Example 9: Get featured courses
+featured = api.get_featured_courses(tagging_code='SFC', page_size=10)
+for course in featured['data']['courses']:
+    print(f"- {course['title']}")
 ```
 
 ### Skills Framework API - Python Client
@@ -161,6 +200,11 @@ All API responses are automatically saved to JSON files:
 - `example_3_search_by_keyword.json` - Keyword search results
 - `example_4_search_by_tagging.json` - Tagging code search results
 - `example_5_autocomplete.json` - Autocomplete suggestions
+- `example_6_subcategories.json` - Course subcategories within a category
+- `example_7_course_details.json` - Comprehensive course details
+- `example_8_related_courses.json` - Related courses list
+- `example_9_popular_courses.json` - Popular/trending courses
+- `example_10_featured_courses.json` - Featured courses from MySkillsFuture
 
 ### Skills Framework API Examples (`data/skills_framework_examples/`)
 
@@ -260,10 +304,11 @@ except requests.exceptions.RequestException as e:
 
 ## 📝 Version History
 
-| Date     | Version | Changes                                              |
-| -------- | ------- | ---------------------------------------------------- |
-| Oct 2025 | 1.0     | Initial release with 5 working Courses API endpoints |
-| Oct 2025 | 1.1     | Added 6 Skills Framework API endpoints               |
+| Date     | Version | Changes                                                                                                                     |
+| -------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Oct 2025 | 1.0     | Initial release with 5 working Courses API endpoints                                                                        |
+| Oct 2025 | 1.1     | Added 6 Skills Framework API endpoints                                                                                      |
+| Oct 2025 | 1.2     | Expanded to 10 Courses API endpoints including Course Details, Related Courses, SubCategories, Popular and Featured courses |
 
 ## 📄 License
 
